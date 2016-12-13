@@ -3,8 +3,10 @@ name: curator
 dependencies: 
 - python3
 files: 
-- curator/click-3.3.tar.gz
-- curator/elasticsearch-curator-3.4.0-dev1.tar.gz
-- curator/elasticsearch-1.7.0.tar.gz
-- curator/urllib3-1.8.3.tar.gz
-
+- curator-deps/click-6.6.tar.gz
+- curator-deps/elasticsearch-curator-4.2.4.tar.gz
+- curator-deps/elasticsearch-2.4.0.tar.gz
+- curator-deps/urllib3-1.19.1.tar.gz
+- curator-deps/PyYAML-3.12.tar.gz
+- curator-deps/voluptuous-0.9.3.tar.gz
+- curator-deps/certifi-2016.9.26.tar.gz

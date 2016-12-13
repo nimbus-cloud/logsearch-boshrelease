@@ -3,6 +3,9 @@ set -u # report the usage of uninitialized variables
 
 export PATH=/var/vcap/packages/python3/bin:$PATH
 
+mkdir -p $BOSH_COMPILE_TARGET/curator
+cp -v curator-deps/* $BOSH_COMPILE_TARGET/curator/
+
 echo "All dependancies should be in $BOSH_COMPILE_TARGET/curator"
 find $BOSH_COMPILE_TARGET/curator
 

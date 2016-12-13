@@ -34,6 +34,7 @@ jobs:
   - { release: logsearch, name: curator }
   - { release: logsearch, name: kibana }
   - { release: logsearch, name: nats_to_syslog }
+  - { release: logsearch, name: reaper }
   resource_pool: cluster_monitor
   networks:
   - name: default
@@ -61,6 +62,11 @@ jobs:
       elasticsearch_port: 9200
       purge_logs:
         retention_period: 7
+    reaper:
+      elasticsearch_host: 127.0.0.1
+      purge_logs:
+        disk_threshold: 70
+        skip_index: ".kibana,kibana-int,.kibana-vipersleeds, .kibana-onlineservice-skymobile"
     elasticsearch_config:
       elasticsearch:
         host: 127.0.0.1
@@ -101,6 +107,7 @@ jobs:
   templates:
   - {name: elasticsearch_config, release: logsearch}
   - {name: curator, release: logsearch}
+  - {name: reaper, release: logsearch}
   resource_pool: maintenance
   networks:
   - name: default
@@ -222,6 +229,9 @@ properties:
     elasticsearch:
       host: (( grab jobs.elasticsearch_master.networks.default.static_ips.[0] ))
       port: 9200
+  reaper:
+    elasticsearch:
+      host: (( grab jobs.elasticsearch_master.networks.default.static_ips.[0] ))
   logstash_parser:
     debug: false
   logstash_ingestor:

@@ -105,7 +105,7 @@ def main():
                     assign_index(env_cluster, node)
                 if node.used_percentage() > threshold:
                     logging.warn("node %s over quota: %f" % (node.name, node.used_percentage()))
-                    logging.warn("indices on %s (%s): %s" % (node.name, node.node_id, node.indices))
+                    # logging.warn("indices on %s (%s): %s" % (node.name, node.node_id, node.indices))
                     logging.warn("Oldest index on the node is %s created at %s" % (old_index, index_created))
                     delete_index(env_cluster, old_index)
                     if old_index not in del_index_lst:

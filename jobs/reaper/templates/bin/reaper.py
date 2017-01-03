@@ -84,7 +84,7 @@ def delete_index(cluster, del_index):
         cluster.indices.delete(index=del_index)
     except Exception:
         logging.error("Can't delete index %s" % del_index)
-    sleep(60)  # Allow time for cluster to normalise
+    sleep(5)  # Allow time for cluster to normalise
 
 
 def main():

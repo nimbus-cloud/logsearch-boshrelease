@@ -90,4 +90,15 @@ output {
 			batch_events => 50
 		}
 	<% end %>
+
+    <% if p('logsearch-migration.enabled') %>
+        redis {
+            host => "<%= p("logsearch-migration.redis.host") %>"
+            port => "<%= p("logsearch-migration.redis.port") %>"
+            data_type => "list"
+            key => "<%= p("logsearch-migration.redis.key") %>"
+            batch => true
+            batch_events => 50
+        }
+    <% end %>
 }

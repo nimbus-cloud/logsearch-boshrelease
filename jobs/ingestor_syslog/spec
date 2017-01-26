@@ -65,3 +65,15 @@ properties:
   archiver.enabled:
     default: false
     description: Additional queue for archive (Redis only)
+
+  logsearch-migration.enabled:
+    default: false
+    description: Additional queue to facilitate migration (Redis only)
+  logsearch-migration.redis.host: 
+    description: Redis host of queue
+  logsearch-migration.redis.port: 
+    description: Redis port of queue
+    default: 6379
+  logsearch-migration.redis.key:
+    description: Name of queue to pull messages from
+    default: logstash

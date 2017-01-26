@@ -3,16 +3,37 @@
 import argparse
 import curator
 import datetime
+import fcntl
 import logging
+import os
+import sys
+
 
 from elasticsearch import Elasticsearch
 from time import sleep
 
+
+###### Ensure script only runs onec - Start
+fh = 0
+
+
+def run_once():
+    global fh
+    fh = open(os.path.realpath(__file__), 'r')
+    try:
+        fcntl.flock(fh, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except:
+        os._exit(0)
+
+
+run_once()
+###### Ensure script only runs onec - End
+
 logging.basicConfig(format='[%(asctime)s] [%(lineno)d] - %(message)s', level=logging.WARN, datefmt='%Y-%m-%d %X %Z')
 parser = argparse.ArgumentParser()
-parser.add_argument("threshold", type=int, help="percentage where index prunring will take place")
+parser.add_argument("threshold", type=int, help="percentage where index pruning will take place")
 parser.add_argument("ip", help="IP address of the eleasticseach API node")
-parser.add_argument("skip", help="comma seperated list of indices to skip")
+parser.add_argument("skip", help="comma separated list of indices to skip")
 args = parser.parse_args()
 clusters = [
     {'env': 'default', 'ip': args.ip}
@@ -37,10 +58,12 @@ class DataNode:
         return (self.used_in_bytes / self.total_in_bytes) * 100
 
     def refresh(self, cluster):
+        logging.warn("Current usage level for node %s: %f%%" % (self.name, (self.used_in_bytes / self.total_in_bytes) * 100))
         self.total_in_bytes = cluster.nodes.stats()['nodes'][self.node_id]['fs']['data'][0]['total_in_bytes']
         self.free_in_bytes = cluster.nodes.stats()['nodes'][self.node_id]['fs']['data'][0]['free_in_bytes']
         self.used_in_bytes = self.total_in_bytes - self.free_in_bytes
         self.indices = []
+        logging.warn("Refreshed usage levels for node %s: %f%%" % (self.name, (self.used_in_bytes / self.total_in_bytes) * 100))
 
 
 def get_nodes(cluster):
@@ -72,10 +95,8 @@ def identify_index_for_del(index_list, indices):
     for index in index_list:
         index_tup = (index, indices.index_info[index]['age']['creation_date'])
         indices_creation.append(index_tup)
-    index_for_del = sorted(indices_creation, key=getKey)[0][0]
-    creation_time = datetime.datetime.utcfromtimestamp(sorted(indices_creation, key=getKey)[0][1])
 
-    return index_for_del, creation_time
+    return sorted(indices_creation, key=getKey)
 
 
 def delete_index(cluster, del_index):
@@ -84,7 +105,7 @@ def delete_index(cluster, del_index):
         cluster.indices.delete(index=del_index)
     except Exception:
         logging.error("Can't delete index %s" % del_index)
-    sleep(5)  # Allow time for cluster to normalise
+    sleep(15)  # Allow time for cluster to normalise
 
 
 def main():
@@ -95,24 +116,17 @@ def main():
         nodes = get_nodes(env_cluster)
         indices = curator.IndexList(env_cluster)
 
-        del_index_lst = []
         for node in nodes:
             if len(node.indices) > 0:
-                old_index, index_created = identify_index_for_del(node.indices, indices)
-                if old_index in del_index_lst:
-                    logging.warn('refreshing data on node %s as disk usage stats may be out of date' % node.name)
-                    node.refresh(cluster=env_cluster)
-                    assign_index(env_cluster, node)
-                if node.used_percentage() > threshold:
-                    logging.warn("node %s over quota: %f" % (node.name, node.used_percentage()))
-                    # logging.warn("indices on %s (%s): %s" % (node.name, node.node_id, node.indices))
+                sorted_indicies = identify_index_for_del(node.indices, indices)
+                while node.used_percentage() > threshold:
+                    old_index = sorted_indicies[0][0]
+                    index_created = datetime.datetime.utcfromtimestamp(sorted_indicies[0][1])
+                    logging.warn("Node %s over quota: %f" % (node.name, node.used_percentage()))
                     logging.warn("Oldest index on the node is %s created at %s" % (old_index, index_created))
                     delete_index(env_cluster, old_index)
-                    if old_index not in del_index_lst:
-                        del_index_lst.append(old_index)
-                        logging.warn(del_index_lst)
-                    else:
-                        logging.error('Index %s already deleted' % old_index)
+                    sorted_indicies.pop(0)
+                    node.refresh(cluster=env_cluster)
                 else:
                     logging.warn("node %s under quota: %f%%" % (node.name, node.used_percentage()))
             else:

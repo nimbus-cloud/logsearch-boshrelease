@@ -70,7 +70,6 @@ case $1 in
     <% end %>
     cat /var/vcap/packages/logsearch-config/timecop.conf >> ${JOB_DIR}/config/logstash.conf
     cat /var/vcap/packages/logsearch-config/deployment.conf >> ${JOB_DIR}/config/logstash.conf
-    cat /var/vcap/packages/logsearch-config/datacentre.conf >> ${JOB_DIR}/config/logstash.conf
 
     echo "} #close filters" >> ${JOB_DIR}/config/logstash.conf
 

@@ -1,6 +1,6 @@
 ---
 name: ingestor_syslog
-packages: 
+packages:
 - logstash
 - java8
 templates:
@@ -16,6 +16,11 @@ properties:
   logstash.metadata_level:
     description: "Whether to include additional metadata throughout the event lifecycle. NONE = disabled, DEBUG = fully enabled"
     default: "NONE"
+  logstash.plugins:
+    description: "Array of hashes describing logstash plugins to install"
+    example:
+    - {name: logstash-output-cloudwatchlogs, version: 2.0.0}
+    default: []
 
   logstash_ingestor.filters:
     description: Filters to execute on the ingestors
@@ -28,39 +33,41 @@ properties:
       A list of output plugins, with a hash of options for each of them. Please refer to example below.
     example:
       outputs:
-        - plugin: rabbitmq
-          options:
-            host: 192.168.1.1
-            user: logsearch
-            password: c1oudbunny
-            exchange_type: "direct"
+      - plugin: rabbitmq
+        options:
+          host: 192.168.1.1
+          user: logsearch
+          password: c1oudbunny
+          exchange_type: "direct"
     default: [ { plugin: "redis", options : {} } ]
 
-  logstash_ingestor.syslog.port: 
+  logstash_ingestor.syslog.port:
     description: Port to listen for syslog messages
     default: 5514
 
-  logstash_ingestor.syslog_tls.port: 
-    description: Port to listen for syslog-TLS messages (omit to disable) 
+  logstash_ingestor.syslog_tls.port:
+    description: Port to listen for syslog-TLS messages (omit to disable)
   logstash_ingestor.syslog_tls.ssl_cert:
     description: Syslog-TLS SSL certificate (file contents, not a path) - required if logstash_ingestor.syslog_tls.port set
   logstash_ingestor.syslog_tls.ssl_key:
     description: Syslog-TLS SSL key (file contents, not a path) - required if logstash_ingestor.syslog_tls.port set
 
-  redis.host: 
+  logstash_ingestor.relp.port:
+    description: Port to listen for RELP messages
+    default: 2514
+
+  redis.host:
     description: Redis host of queue
-  redis.port: 
+  redis.port:
     description: Redis port of queue
     default: 6379
-  redis.key: 
+  redis.key:
     description: Name of queue to pull messages from
     default: logstash
   redis.congestion_interval:
     description: How often to check for queue length. Default is one second. Zero means to check on every message
-    default: 10
   redis.congestion_threshold:
     description: Max number of messages to allow in the queue.  Will stop (and drop) ingesting new messages when this is reached
-    default: 1000000
 
   archiver.enabled:
     default: false

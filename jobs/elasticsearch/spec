@@ -6,6 +6,7 @@ packages:
 - java8
 templates:
   bin/drain.erb: bin/drain
+  bin/post-deploy.erb: bin/post-deploy
   bin/elasticsearch_ctl: bin/elasticsearch_ctl
   bin/monit_debugger: bin/monit_debugger
   config/config.yml.erb: config/elasticsearch.yml
@@ -16,10 +17,6 @@ templates:
   logsearch/metric-collector/elasticsearch/collector: logsearch/metric-collector/elasticsearch/collector
   logsearch/logs.yml: logsearch/logs.yml
 properties:
-  elasticsearch.drain:
-    description: Whether to use the built-in drain features to improve deployment reliability
-    # disabled while we do additional testing
-    default: false
   elasticsearch.master_hosts:
     description: The list of elasticsearch master node IPs
   elasticsearch.cluster_name:
@@ -40,6 +37,9 @@ properties:
   elasticsearch.exec.options:
     description: An array of additional options to pass when starting elasticsearch
     default: []
+  elasticsearch.limits.fd:
+    description: Maximum file descriptors
+    default: 65536
   elasticsearch.discovery.minimum_master_nodes:
     description: The minimum number of master eligible nodes a node should "see" in order to operate within the cluster. Recommended to set it to a higher value than 1 when running more than 2 nodes in the cluster.
     default: 1

@@ -4,8 +4,11 @@ set -e
 
 <%
 # Look ma, I'm writing Chef
-def put_to_es(url_stem_base, es_config)
+require 'uri'
+
+def put_to_es(url_stem_base, es_config, request_params = {})
   ret = []
+  es_config = Array(es_config)
   es_config.each do |config|
     if config.is_a? Hash
       ckey, content = config.to_a.first
@@ -14,6 +17,12 @@ def put_to_es(url_stem_base, es_config)
       content = config
     end
     url_stem = "#{url_stem_base}/#{ckey}".chomp('/')
+
+    if request_params.keys.any?
+      params = URI.encode_www_form(request_params)
+      url_stem << "?#{params}"
+    end
+
     ret << "URL=http://#{p('elasticsearch_config.elasticsearch.host')}:#{p('elasticsearch_config.elasticsearch.port')}/#{url_stem}"
     if nil == content
      ret << 'curl -X DELETE "${URL}"'
@@ -54,19 +63,7 @@ end
 # wait for elasticsearch availability
 #
 
-READY=false
-
-while [ "false" == "$READY" ] ; do
-    STATUS=$(curl -s http://<%= p("elasticsearch_config.elasticsearch.host") %>:<%= p("elasticsearch_config.elasticsearch.port") %>'/_cat/health?h=status' | tr -d '[:space:]')
-
-    if [ "green" == "$STATUS" ] ; then
-        READY=true
-        echo "Cluster is green!!!"
-    else
-        sleep 1
-        echo "Waiting for cluster to be green"
-    fi
-done
+until curl -f 'http://<%= p("elasticsearch_config.elasticsearch.host") %>:<%= p("elasticsearch_config.elasticsearch.port") %>/_cluster/health?wait_for_status=yellow&timeout=10m'; do :; done
 
 #
 # templates
@@ -78,3 +75,9 @@ done
 #
 <%= put_to_es('', p('elasticsearch_config.docs')) %>
 
+#
+# license
+#
+<% if_p("elasticsearch_config.license") do |license| %>
+  <%= put_to_es('_license', license, acknowledge: true) %>
+<% end %>

@@ -15,8 +15,6 @@ templates:
   config/filters_post.conf.erb: config/filters_post.conf
   config/filters_override.conf.erb: config/filters_override.conf
   logsearch/logs.yml: logsearch/logs.yml
-  config/rsyslog_archiver.conf: config/rsyslog_archiver.conf
-  bin/pre-start: bin/pre-start
 properties:
   logstash.metadata_level:
     description: "Whether to include additional metadata throughout the event lifecycle. NONE = disabled, DEBUG = fully enabled"
@@ -32,8 +30,8 @@ properties:
     description: "The configuration to embed into the logstash filters section. Can either be a set of parsing rules as a string or a list of hashes in the form of [{name: path_to_parsing_rules.conf}]"
     default: ''
   logstash_parser.deployment_dictionary:
-    description: "A file that contains a hash of job name-deployment name keypairs for @source.deployment lookup"
-    default: "/var/vcap/packages/logsearch-config/deployment_lookup.yml"
+    description: "A list of files concatenated into one deployment dictionary file. Each file contains a hash of job name-deployment name keypairs for @source.deployment lookup."
+    default: [ "/var/vcap/packages/logsearch-config/deployment_lookup.yml" ]
   logstash_parser.inputs:
     description: |
       A list of input plugins, with a hash of options for each of them. Please refer to example below.
@@ -46,23 +44,38 @@ properties:
             password: c1oudbunny
     default: [ { plugin: "redis", options : {} } ]
   logstash_parser.outputs:
-    description: "The configuration to embed into the logstash outputs section"
+    description: |
+      A list of output plugins, with a hash of options for each of them. Please refer to example below.
+    example:
+      inputs:
+        - plugin: mongodb
+          options:
+            uri: 192.168.1.1
+            database: logsearch
+            collection: logs                      
+    default: [ { plugin: "elasticsearch", options: {} } ]
   logstash_parser.workers:
     description: "The number of worker threads that logstash should use (default: auto = one per CPU)"
     default: auto
-  logstash_parser.idle_flush_time:
-    description: "How frequently to flush events if the output queue is not full."
-  logstash_parser.elasticsearch_document_id:
+  logstash_parser.elasticsearch.idle_flush_time:
+    description: "How frequently to flush events if the output queue is not full." 
+  logstash_parser.elasticsearch.document_id:
     description: "Use a specific, dynamic ID rather than an auto-generated identifier."
     default: ~
-  logstash_parser.elasticsearch_index:
+  logstash_parser.elasticsearch.index:
     description: "The specific, dynamic index name to write events to."
     default: "logstash-%{+YYYY.MM.dd}"
-  logstash_parser.elasticsearch_index_type:
+  logstash_parser.elasticsearch.index_type:
     description: "The specific, dynamic index type name to write events to."
     default: "%{@type}"
-  logstash_parser.elasticsearch_routing:
+  logstash_parser.elasticsearch.routing:
     description: "The routing to be used when indexing a document."
+  logstash_parser.elasticsearch.data_hosts:
+    description: The list of elasticsearch data node IPs
+    default: [127.0.0.1]
+  logstash_parser.elasticsearch.flush_size:
+    description: Controls how many logs will be buffered and sent to Elasticsearch for bulk indexing
+    default: 500  
   logstash_parser.timecop.reject_greater_than_hours:
     description: "Logs with timestamps greater than this many hours in the future won't be parsed and will get tagged with fail/timecop"
     default: 1
@@ -76,13 +89,6 @@ properties:
     description: "A list of index templates that need to be present in ElasticSearch before the process starts"
     default: ["index_template"]
 
-  logstash.output.elasticsearch.data_hosts:
-    description: The list of elasticsearch data node IPs
-    default: [127.0.0.1]
-  logstash.output.elasticsearch.flush_size:
-    description: Controls how many logs will be buffered and sent to Elasticsearch for bulk indexing
-    default: 500
-
   redis.host:
     description: Redis host of queue
   redis.port:
@@ -91,13 +97,3 @@ properties:
   redis.key:
     description: Name of queue to pull messages from
     default: logstash
-
-  syslog_forwarder.logfiles:
-    description: List of local log files to be sent to a remote syslog server
-    default: []
-  syslog_forwarder.hostname:
-    description: Hostname of the remote syslog server
-    default: ""
-  syslog_forwarder.port:
-    description: Port of the remote syslog server
-    default: 514

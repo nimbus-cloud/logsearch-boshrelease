@@ -6,14 +6,12 @@ import datetime
 import fcntl
 import logging
 import os
-import sys
-
 
 from elasticsearch import Elasticsearch
 from time import sleep
+from urllib3 import Timeout
 
-
-###### Ensure script only runs onec - Start
+# Ensure script only runs onec - Start
 fh = 0
 
 
@@ -27,7 +25,7 @@ def run_once():
 
 
 run_once()
-###### Ensure script only runs onec - End
+# Ensure script only runs onec - End
 
 logging.basicConfig(format='[%(asctime)s] [%(lineno)d] - %(message)s', level=logging.WARN, datefmt='%Y-%m-%d %X %Z')
 parser = argparse.ArgumentParser()
@@ -38,10 +36,10 @@ args = parser.parse_args()
 clusters = [
     {'env': 'default', 'ip': args.ip}
 ]
-
 threshold = args.threshold
 skip_arg = args.skip
 skip_index = (skip_arg.replace(' ', '')).split(',')
+timeoutobj = Timeout(total=1200, connect=10, read=23)  # sets timeout on connection to elasticsearch cluster
 
 
 class DataNode:
@@ -112,7 +110,7 @@ def main():
     for cluster in clusters:
         logging.warn("Skip index includes: %s" % skip_index)
         logging.warn("Checking nodes in %s" % cluster['env'])
-        env_cluster = Elasticsearch(hosts=cluster['ip'])
+        env_cluster = Elasticsearch(hosts=cluster['ip'], timeout=timeoutobj)
         nodes = get_nodes(env_cluster)
         indices = curator.IndexList(env_cluster)
 

@@ -1,8 +1,10 @@
 ---
 name: cerebro
+
 packages:
 - cerebro
 - java8
+
 templates:
   bin/cerebro_ctl: bin/cerebro_ctl
   bin/monit_debugger: bin/monit_debugger
@@ -12,6 +14,21 @@ templates:
   helpers/ctl_setup.sh: helpers/ctl_setup.sh
   helpers/ctl_utils.sh: helpers/ctl_utils.sh
 
+consumes:
+ - name: elasticsearch
+   type: elasticsearch
+   optional: true
+
 properties:
   elasticsearch.cluster_name:
     description: The name of the elastic search cluster
+  cerebro.exec.options:
+    description: An array of additional options to pass when starting cerebro
+    default: []
+  cerebro.secret:
+    description: Secret will be used to sign Cerebro session cookies and CSRF tokens.
+  cerebro.user:
+    description: "Username for HTTP basic auth."
+    default: cerebro
+  cerebro.password:
+    description: "Password for HTTP basic auth."

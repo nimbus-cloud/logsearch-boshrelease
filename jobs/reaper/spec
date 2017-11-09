@@ -1,16 +1,25 @@
 ---
 name: reaper
+
+
 templates:
-  bin/reaper: bin/reaper
+  bin/reaper.sh.erb: bin/reaper
   bin/reaper.py: bin/reaper.py
   bin/reaper_ctl: bin/reaper_ctl
   config/reaper.cron: config/reaper.cron
   helpers/ctl_utils.sh: helpers/ctl_utils.sh
   helpers/ctl_setup.sh: helpers/ctl_setup.sh
   data/properties.sh.erb: data/properties.sh
+
+consumes:
+ - name: elasticsearch
+   type: elasticsearch
+   optional: true
+
 packages:
   - curator
   - python3
+
 properties:
   reaper.elasticsearch.host:
     description: IP address of elasticsearch host to proxy requests for (eg, 127.0.0.1)

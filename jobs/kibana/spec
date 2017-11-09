@@ -1,14 +1,29 @@
 ---
-name: "kibana"
+name: kibana
+
 packages:
-  - "kibana"
+  - kibana
+
 templates:
-  bin/kibana_ctl: "bin/kibana_ctl"
-  config/kibana.conf.erb: "config/kibana.conf"
-  bin/monit_debugger: "bin/monit_debugger"
-  data/properties.sh.erb: "data/properties.sh"
-  helpers/ctl_setup.sh: "helpers/ctl_setup.sh"
-  helpers/ctl_utils.sh: "helpers/ctl_utils.sh"
+  bin/kibana_ctl: bin/kibana_ctl
+  config/kibana.conf.erb: config/kibana.conf
+  bin/monit_debugger: bin/monit_debugger
+  data/properties.sh.erb: data/properties.sh
+  helpers/ctl_setup.sh: helpers/ctl_setup.sh
+  helpers/ctl_utils.sh: helpers/ctl_utils.sh
+  bin/post-start.erb: bin/post-start
+
+consumes:
+- name: elasticsearch
+  type: elasticsearch
+  optional: true
+
+provides:
+- name: kibana
+  type: kibana
+  properties:
+  - kibana.port
+
 properties:
   kibana.elasticsearch.host:
     description: "IP address of elasticsearch master to send elasticsearch requests to"
@@ -37,6 +52,12 @@ properties:
   kibana.env:
     description: "a list of arbitrary key-value pairs to be passed on as process environment variables. eg: FOO: 123"
     default: []
+  kibana.source_files:
+    description: "List of files to source in kibana control script"
+    default: []
+  kibana.console_enabled:
+    description: "Enable Kibana development console; should be set to `false` in a multi-tenant deployment."
+    default: false
   kibana.config_options:
     description: "Additional options to append to kibana's config.yml (YAML format)."
     default: ~
@@ -49,3 +70,12 @@ properties:
   kibana.wait_for_templates:
     description: "A list of index templates that need to be present in ElasticSearch before the process starts"
     default: []
+  kibana.health.disable_post_start:
+    description: Allow node to run post-start script? (true / false)
+    default: false
+  kibana.health.interval:
+    description: Kibana health check interval (seconds)
+    default: 5
+  kibana.health.timeout:
+    description: Kibana health check number of attempts (seconds)
+    default: 300

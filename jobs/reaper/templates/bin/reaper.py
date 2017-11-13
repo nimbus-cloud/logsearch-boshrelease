@@ -64,7 +64,7 @@ def assign_index(cluster, node):
 
 
 def getKey(item):
-    return item[0]
+    return item[1]
 
 
 def identify_index_for_del(index_list, indices):

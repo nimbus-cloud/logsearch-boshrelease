@@ -103,3 +103,6 @@ properties:
   elasticsearch.health.disable_post_start:
     description: Allow node to run post-start script? (true / false)
     default: false
+  elasticsearch.other_masters:
+    description: list of other master nodes
+    default: ~

@@ -51,7 +51,19 @@ discovery.zen.minimum_master_nodes: <%= minimum_master_nodes %>
     master_hosts = p("elasticsearch.master_hosts").join(',')
   end
 %>
+
+<% if p("elasticsearch.cluster_name") != "monitor" %>
+discovery.zen.ping.unicast.hosts: "<%= master_hosts %><% if_p('elasticsearch.other_masters') do | m | %>,<%= m %><% end %>"
+<% else %>
 discovery.zen.ping.unicast.hosts: "<%= master_hosts %>"
+<% end %>
+
 
 <% if_p('elasticsearch.config_options') do | v | %><%= v %><% end %>
 
+<%
+master_node = p("elasticsearch.node.allow_master")
+if master_node == true 
+%>
+cluster.routing.allocation.awareness.attributes: location
+<% end %>

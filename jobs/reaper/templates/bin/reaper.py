@@ -25,8 +25,9 @@ skip_index = (skip_arg.replace(' ', '')).split(',')
 
 class DataNode:
 
-    def __init__(self, name, node_id, info):
+    def __init__(self, name, ip, node_id, info):
         self.name = name
+        self.ip = ip
         self.node_id = node_id
         self.total_in_bytes = info['total_in_bytes']
         self.free_in_bytes = info['free_in_bytes']
@@ -49,10 +50,11 @@ def get_nodes(cluster):
         node_data = cluster.nodes.stats()['nodes'][node]
         if node_data['indices']['docs']['count'] > 0:
             node_info = node_data['fs']['data'][0]
-            data_node = DataNode(name=node_data['name'], node_id=node, info=node_info)
+            data_node = DataNode(name=node_data['name'], ip=node_data['host'], node_id=node, info=node_info)
             assign_index(cluster, data_node)
             node_list.append(data_node)
 
+    node_list.sort(key=lambda x: x.name)
     return node_list
 
 
@@ -114,7 +116,7 @@ def main():
                     else:
                         logging.error('Index %s already deleted' % old_index)
                 else:
-                    logging.warn("node %s under quota: %f%%" % (node.name, node.used_percentage()))
+                    logging.warn("node %s (%s) under quota: %f%%" % (node.name, node.ip, node.used_percentage()))
             else:
                 logging.warn("no indices associated to node %s" % node.name)
         logging.warn('-----------------')

@@ -6,7 +6,7 @@ templates:
   bin/reaper.sh.erb: bin/reaper
   bin/reaper.py: bin/reaper.py
   bin/reaper_ctl: bin/reaper_ctl
-  config/reaper.cron: config/reaper.cron
+  config/reaper.cron.erb: config/reaper.cron
   helpers/ctl_utils.sh: helpers/ctl_utils.sh
   helpers/ctl_setup.sh: helpers/ctl_setup.sh
   data/properties.sh.erb: data/properties.sh
@@ -30,3 +30,6 @@ properties:
   reaper.purge_logs.skip_index:
     description: comma seperated values of indices to ignore
     default: ".kibana"
+  reaper.purge_logs.cron:
+    description: cron schedule
+    default: "*/25 * * * *"

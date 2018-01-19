@@ -15,7 +15,7 @@
 set -e
 set -u
 
-ELASTICSEARCH_HOST=<%= elasticsearch_hosts %>
+ELASTICSEARCH_HOST='<%= elasticsearch_hosts %>'
 THRESHOLD=<%= p('reaper.purge_logs.disk_threshold') %>
 SKIP="<%= p('reaper.purge_logs.skip_index') %>"
 

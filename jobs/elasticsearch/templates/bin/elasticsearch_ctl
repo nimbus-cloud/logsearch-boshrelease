@@ -13,8 +13,7 @@ export LANG=en_US.UTF-8
 export <%= k %>=<%= v %>
 <% end %>
 
-export HEAP_SIZE=$((( $( cat /proc/meminfo | grep MemTotal | awk '{ print $2 }' ) * 46 ) / 100 ))K
-
+export HEAP_SIZE=$((( $( cat /proc/meminfo | grep MemTotal | awk '{ print $2 }' ) * <%= p("elasticsearch.heap_percentage") %> ) / 100 ))K
 <% if_p('elasticsearch.heap_size') do |heap_size| %>
   HEAP_SIZE=<%= heap_size %>
 <% end %>
@@ -40,6 +39,9 @@ case $1 in
 
     # install plugins
     rm -rf /var/vcap/packages/elasticsearch/plugins/*
+    <% if_p('elasticsearch.cloud.aws.access_key', 'elasticsearch.cloud.aws.secret_key') do %>
+      /var/vcap/packages/elasticsearch/bin/elasticsearch-plugin install -b repository-s3
+    <% end %>
     <% p("elasticsearch.plugins").each do |plugin| name, path = plugin.first %>
       <% if path.start_with? '/var/vcap' %>
         /var/vcap/packages/elasticsearch/bin/elasticsearch-plugin install "file://<%= path %>"

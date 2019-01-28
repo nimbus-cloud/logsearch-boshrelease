@@ -58,7 +58,6 @@ output {
         <%
           options = {
             "hosts" => [ p('logstash_parser.elasticsearch.data_hosts').map { |ip| "#{ip}:9200" }.join(',') ],
-            "flush_size" => p('logstash_parser.elasticsearch.flush_size'),
             "index" => p('logstash_parser.elasticsearch.dedicated_index_name'),
             "document_type" => p('logstash_parser.elasticsearch.index_type'),
             "manage_template" => false

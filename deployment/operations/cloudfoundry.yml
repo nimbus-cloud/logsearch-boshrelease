@@ -72,7 +72,7 @@
 - type: replace
   path: /instance_groups/name=ingestor/jobs/name=ingestor_syslog/properties/logstash_parser/elasticsearch?
   value:
-    index: logs-%{[@metadata][index]}-%{+YYYY.MM.dd}
+    index: logs-%{[@metadata][index]}-v6-%{+YYYY.MM.dd}
 
 - type: replace
   path: /instance_groups/name=ingestor/jobs/-
@@ -168,6 +168,6 @@
   path: /releases/-
   value:
     name: logsearch-for-cloudfoundry
-    url: https://s3.amazonaws.com/logsearch-for-cloudfoundry/logsearch-for-cloudfoundry-207.0.2.tgz
-    version: 207.0.2
-    sha1: 40c1f1bb9a60a4832280824d5fb508031a9558a7
+    url: https://s3.amazonaws.com/logsearch-for-cloudfoundry/logsearch-for-cloudfoundry-210.0.0.tgz
+    version: 210.0.0
+    sha1: f427b07793484b8b8f3f3dd665055e805d9224b9

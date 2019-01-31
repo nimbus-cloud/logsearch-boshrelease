@@ -33,6 +33,12 @@ instance_groups:
       elasticsearch:
         node:
           allow_master: true
+        config_options:
+          xpack.monitoring.enabled: false
+          xpack.graph.enabled: false
+          xpack.ml.enabled: false
+          xpack.security.enabled: false
+          xpack.watcher.enabled: false
   - name: syslog_forwarder
     release: logsearch
     consumes:
@@ -172,6 +178,12 @@ instance_groups:
       elasticsearch:
         node:
           allow_data: true
+        config_options:
+          xpack.monitoring.enabled: false
+          xpack.graph.enabled: false
+          xpack.ml.enabled: false
+          xpack.security.enabled: false
+          xpack.watcher.enabled: false
   - name: syslog_forwarder
     release: logsearch
     consumes:
@@ -210,10 +222,15 @@ instance_groups:
     properties:
       kibana:
         health:
-          timeout: 300
+          timeout: 500
         env:
           - NODE_ENV: production
-          
+        config_options:
+          xpack.monitoring.enabled: false
+          xpack.graph.enabled: false
+          xpack.ml.enabled: false
+          xpack.security.enabled: false
+          xpack.watcher.enabled: false
   - name: syslog_forwarder
     release: logsearch
     consumes:
@@ -286,13 +303,13 @@ instance_groups:
 
 releases:
 - name: logsearch
-  url: https://s3.amazonaws.com/logsearch/logsearch-209.1.0.tgz
-  version: 209.1.0
-  sha1: 9382afb66131755e11691e969cc0628f4ecb1b50
+  url: https://s3.amazonaws.com/logsearch/logsearch-210.0.0.tgz
+  version: 210.0.0
+  sha1: cf5f2f90d1382eb9648d9f9d3b62201af73bf39a
 
 stemcells:
 - alias: default
-  os: ubuntu-trusty
+  os: ubuntu-xenial
   version: "latest"
 
 variables: []

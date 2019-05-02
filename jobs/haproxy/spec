@@ -28,6 +28,9 @@ consumes:
   optional: true
 
 properties:
+  haproxy.syslog_fwd_only:
+    description: "Set to true to enable syslog forwarding only"
+    default: false
   haproxy.syslog_server:
     description: "An IPv4 address optionally followed by a colon and a UDP port. It can also be an IPv6 address or filesystem path to a UNIX domain socket."
     default: "127.0.0.1"

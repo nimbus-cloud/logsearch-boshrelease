@@ -7,7 +7,7 @@ update:
   serial: false
   update_watch_time: 5000-1200000
 
-instance_groups: 
+instance_groups:
 - name: elasticsearch_master
   azs:
   - z1
@@ -92,11 +92,17 @@ instance_groups:
         - index-mappings: /var/vcap/jobs/elasticsearch_config/index-templates/index-mappings.json
   - name: ingestor_syslog
     release: logsearch
+    consumes:
+      elasticsearch: nil
     provides:
       syslog_forwarder: {as: cluster_monitor}
       ingestor: nil
+      ingestor_inputs: nil
     properties:
       logstash_parser:
+        elasticsearch:
+          data_hosts:
+          - 127.0.0.1
         filters:
         - monitor: /var/vcap/packages/logsearch-config/logstash-filters-monitor.conf
   - name: curator
@@ -263,10 +269,16 @@ instance_groups:
       elasticsearch: {from: elasticsearch_master}
   - name: ingestor_syslog
     release: logsearch
+    consumes:
+      elasticsearch: nil
     provides:
       ingestor: {as: ingestor_link}
+      ingestor_inputs: nil
     properties:
       logstash_parser:
+        elasticsearch:
+          data_hosts:
+          - 127.0.0.1
         deployment_dictionary:
           - /var/vcap/packages/logsearch-config/deployment_lookup.yml
   - name: syslog_forwarder
@@ -283,7 +295,7 @@ instance_groups:
         - file: /var/vcap/sys/log/ingestor_syslog/ingestor_syslog.stdout.log
           service: ingestor
         - file: /var/vcap/sys/log/ingestor_syslog/ingestor_syslog.stderr.log
-          service: ingestor        
+          service: ingestor
 - name: ls-router
   azs:
   - z1
@@ -303,9 +315,9 @@ instance_groups:
 
 releases:
 - name: logsearch
-  url: https://s3.amazonaws.com/logsearch/logsearch-210.0.0.tgz
-  version: 210.0.0
-  sha1: cf5f2f90d1382eb9648d9f9d3b62201af73bf39a
+  url: https://s3.amazonaws.com/logsearch/logsearch-210.4.0.tgz
+  version: 210.4.0
+  sha1: d28bc9314c937de3aeab45d11548d0914fb54c2d
 
 stemcells:
 - alias: default

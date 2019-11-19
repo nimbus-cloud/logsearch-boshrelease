@@ -32,15 +32,70 @@
     name: redis
     azs: [z1]
     instances: 1
-    persistent_disk_type: 2GB
-    vm_type: m3.medium
+    persistent_disk_type: default
+    vm_type: default
     stemcell: default
     update:
       serial: true
     networks:
-    - name: default
+    - name: infra
     jobs:
     - name: redis
       release: logsearch-for-cloudfoundry
       provides:
         redis: {as: redis_link}
+
+
+        # config_options:
+        #   xpack.monitoring.enabled: false
+        #   xpack.graph.enabled: false
+        #   xpack.ml.enabled: false
+        #   xpack.security.enabled: false
+        #   xpack.watcher.enabled: false
+
+
+# - type: replace
+#   path: /instance_groups/-
+#   value:
+#     name: dedicated_shard_routing_errand
+#     lifecycle: errand
+#     azs: [z1]
+#     instances: 1
+#     persistent_disk_type: default
+#     vm_type: default
+#     stemcell: default
+#     update:
+#       serial: true
+#     networks:
+#     - name: infra
+#     jobs:
+#     - name: dedicated_shard_routing
+#       release: logsearch-for-cloudfoundry
+#       consumes:
+#         elasticsearch: {from: elasticsearch_master}
+#       properties:
+#         dedicated_shard_routing:
+#           dedicated_cf_orgs: ((dedicated-cf-orgs))
+#           platform_logs: true
+
+
+# - type: replace
+#   path: /instance_groups/-
+#   value:
+#     name: upload-kibana-objects
+#     lifecycle: errand
+#     azs: [z1]
+#     instances: 1
+#     persistent_disk_type: default
+#     vm_type: default
+#     stemcell: default
+#     update:
+#       serial: true
+#     networks:
+#     - name: infra
+#     jobs:
+#     - consumes:
+#         elasticsearch:
+#           from: elasticsearch_master
+#       name: upload-kibana-objects
+#       release: logsearch-for-cloudfoundry

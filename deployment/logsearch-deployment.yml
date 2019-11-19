@@ -156,11 +156,15 @@ instance_groups:
         config:
         - file: /var/vcap/sys/log/curator/curator.log
           service: curator
-  - name: smoke_tests
-    release: logsearch
-    consumes:
-      elasticsearch: {from: elasticsearch_master}
-      ingestor_link: {from: ingestor_syslog}
+  # - name: smoke_tests
+  #   release: logsearch
+  #   consumes:
+  #     elasticsearch: {from: elasticsearch_master}
+  #     ingestor_link: {from: ingestor_syslog}
+  #   properties:
+  #     syslog_ingestor:
+  #       host: 10.131.174.30
+
 - name: elasticsearch_data
   azs:
   - z1
@@ -313,11 +317,34 @@ instance_groups:
       kibana: {from: kibana_link}
       syslog_forwarder: {from: cluster_monitor}
 
+# - name: dedicated_shard_routing_errand
+#   lifecycle: errand
+#   azs:
+#   - z1
+#   instances: 1
+#   vm_type: medium
+#   stemcell: default
+#   update:
+#     max_in_flight: 1
+#     serial: true
+#   networks:
+#   - name: infra
+#   jobs:
+#   - name: dedicated_shard_routing
+#     release: logsearch-for-cloudfoundry
+#     consumes:
+#       elasticsearch: {from: elasticsearch_master}
+#     properties:
+#       dedicated_shard_routing:
+#         dedicated_cf_orgs: ((dedicated-cf-orgs))
+#         platform_logs: true
+
+
 releases:
 - name: logsearch
-  url: https://s3.amazonaws.com/logsearch/logsearch-210.4.0.tgz
+  url: https://bosh.io/d/github.com/cloudfoundry-community/logsearch-boshrelease?v=210.4.0
   version: 210.4.0
-  sha1: d28bc9314c937de3aeab45d11548d0914fb54c2d
+  sha1: e30ddd5560449c074823ee4d18c238937156f682
 
 stemcells:
 - alias: default

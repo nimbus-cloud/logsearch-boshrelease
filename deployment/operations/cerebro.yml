@@ -21,11 +21,11 @@
     properties:
       route_registrar:
         routes:
-        - name: cerebro
+        - name: cerebro-platform
           port: 9000
           registration_interval: 60s
           uris:
-          - "cerebro.((system_domain))"
+          - "cerebro-platform.((system_domain))"
 
 - type: replace
   path: /instance_groups/name=elasticsearch_master/jobs/name=bpm?/release
@@ -43,3 +43,24 @@
   value:
     name: cerebro_auth_password
     type: password
+
+- type: replace
+  path: /releases/-
+  value:
+    name: routing
+    version: latest
+    
+
+- type: replace
+  path: /releases/-
+  value:
+    name: bpm
+    version: latest
+
+- type: replace
+  path: /releases/-
+  value:
+    name: logsearch-for-cloudfoundry
+    version: 210.4.1-rc.3
+    url: http://s4-viewer.cf.paas.bskyb.com/logsearch-for-cloudfoundry/logsearch-for-cloudfoundry-210.4.1-rc.3.tgz
+    sha1: fb75acbb9198ceef0acf11bea92a7d5c388525f5

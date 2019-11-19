@@ -26,3 +26,22 @@
           xpack.ml.enabled: false
           xpack.security.enabled: false
           xpack.watcher.enabled: false
+
+- type: replace
+  path: /instance_groups/-
+  value:
+    name: redis
+    azs: [z1]
+    instances: 1
+    persistent_disk_type: default
+    vm_type: default
+    stemcell: default
+    update:
+      serial: true
+    networks:
+    - name: infra
+    jobs:
+    - name: redis
+      release: logsearch-for-cloudfoundry
+      provides:
+        redis: {as: redis_link}

@@ -61,6 +61,6 @@
   path: /releases/-
   value:
     name: logsearch-for-cloudfoundry
-    version: 210.4.1-rc.3
-    url: http://s4-viewer.cf.paas.bskyb.com/logsearch-for-cloudfoundry/logsearch-for-cloudfoundry-210.4.1-rc.3.tgz
-    sha1: fb75acbb9198ceef0acf11bea92a7d5c388525f5
+    version: 210.4.0
+    url: https://bosh.io/d/github.com/cloudfoundry-community/logsearch-for-cloudfoundry?v=210.4.0
+    sha1: 423f801b174aa7db9c2f16c6ad836dd4566ace7d

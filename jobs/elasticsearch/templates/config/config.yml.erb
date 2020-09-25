@@ -20,6 +20,7 @@ node.name: "<%= name %>/<%= index %>"
 node.master: <%= p("elasticsearch.node.allow_master") %>
 node.data: <%= p("elasticsearch.node.allow_data") %>
 node.ingest: <%= p("elasticsearch.node.allow_ingest") %>
+node.attr.location: "<%= spec.az %>-<%= p("elasticsearch.node.location") %>"
 <% p("elasticsearch.node.tags", {}).each do | k, v | %>
 node.attr.<%= k %>: "<%= v %>"
 <% end %>

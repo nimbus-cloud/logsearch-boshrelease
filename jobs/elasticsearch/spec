@@ -80,6 +80,9 @@ properties:
   elasticsearch.health.connect_interval:
     description: Post-start interval for node to become available (seconds)
     default: 5
+  elasticsearch.node.location:
+    description: location of node
+    default: dc1
   elasticsearch.node.tags:
     description: A hash of additional tags for the node
   elasticsearch.exec.environment:
